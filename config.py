@@ -2,9 +2,7 @@ import os
 
 model_name = os.environ['MODEL_NAME'] if 'MODEL_NAME' in os.environ else 'NAML'
 # Currently included model
-assert model_name in [
-    'NRMS', 'NAML', 'LSTUR', 'DKN', 'HiFiArk', 'TANR', 'Exp1'
-]
+assert model_name in ['NAML']
 
 
 class BaseConfig():
@@ -47,13 +45,3 @@ class NAMLConfig(BaseConfig):
     num_filters = 300
     window_size = 3
 
-
-class Exp1Config(BaseConfig):
-    dataset_attributes = {
-        # TODO ['category', 'subcategory', 'title', 'abstract'],
-        "news": ['category', 'subcategory', 'title'],
-        "record": []
-    }
-    # For multi-head self-attention
-    num_attention_heads = 15
-    ensemble_factor = 1  # Not use ensemble since it's too expensive

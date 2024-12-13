@@ -12,7 +12,7 @@ import importlib
 from multiprocessing import Pool
 
 try:
-    Model = getattr(importlib.import_module(f"model.{model_name}"), model_name)
+    Model = getattr(importlib.import_module("NAML_Model"), model_name)
     config = getattr(importlib.import_module('config'), f"{model_name}Config")
 except AttributeError:
     print(f"{model_name} not included!")
@@ -100,8 +100,6 @@ class UserDataset(Dataset):
             else:
                 user_missed += 1
                 self.behaviors.at[row.Index, 'user'] = 0
-        if model_name == 'LSTUR':
-            print(f'User miss rate: {user_missed/user_total:.4f}')
 
     def __len__(self):
         return len(self.behaviors)
@@ -222,12 +220,9 @@ def evaluate(model, directory, num_workers, max_count=sys.maxsize):
                             dim=0) for news_list in minibatch["clicked_news"]
             ],
                                               dim=0).transpose(0, 1)
-            if model_name == 'LSTUR':
-                user_vector = model.get_user_vector(
-                    minibatch['user'], minibatch['clicked_news_length'],
-                    clicked_news_vector)
-            else:
-                user_vector = model.get_user_vector(clicked_news_vector)
+
+            user_vector = model.get_user_vector(clicked_news_vector)
+
             for user, vector in zip(user_strings, user_vector):
                 if user not in user2vector:
                     user2vector[user] = vector
