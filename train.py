@@ -187,7 +187,13 @@ def train():
                         }, f"./checkpoint/{model_name}/ckpt-{step}.pth")
                 except OSError as error:
                     print(f"OS error: {error}")
-
+    final_model_path = f"./checkpoint/{model_name}/final_model.pth"
+    torch.save({
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'step': step,
+    }, final_model_path)
+    print(f"Final model saved to {final_model_path}")
 
 def time_since(since):
     """
