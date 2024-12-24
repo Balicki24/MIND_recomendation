@@ -25,7 +25,7 @@ class BaseConfig():
     negative_sampling_ratio = 2  # K
     dropout_probability = 0.2
     # Modify the following by the output of `src/dataprocess.py`
-    num_words = 1 + 101221
+    num_words = 1 + 101508
     num_categories = 1 + 295
     num_entities = 1 + 21842
     num_users = 1 + 711222
