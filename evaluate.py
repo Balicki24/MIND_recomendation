@@ -236,7 +236,7 @@ def evaluate(model, directory, num_workers, max_count=sys.maxsize):
     count = 0
 
     tasks = []
-
+    
     for minibatch in tqdm(behaviors_dataloader,
                           desc="Calculating probabilities"):
         count += 1
