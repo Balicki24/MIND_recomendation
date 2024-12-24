@@ -258,11 +258,7 @@ if __name__ == '__main__':
     # Don't need to load pretrained word/entity/context embedding
     # since it will be loaded from checkpoint later
     model = Model(config).to(device)
-    from train import latest_checkpoint  # Avoid circular imports
-    checkpoint_path = latest_checkpoint(path.join('./checkpoint/NAML/fina_model.pth'))
-    if checkpoint_path is None:
-        print('No checkpoint file found!')
-        exit()
+    checkpoint_path = './checkpoint/NAML/fina_model.pth'
     print(f"Load saved parameters in {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint['model_state_dict'])
