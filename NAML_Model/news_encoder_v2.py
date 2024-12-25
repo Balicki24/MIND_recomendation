@@ -44,7 +44,6 @@ class ElementEncoder(torch.nn.Module):
     def forward(self, element):
         return F.relu(self.linear(self.embedding(element)))
 
-
 class NewsEncoder_v2(torch.nn.Module):
     def __init__(self, config, pretrained_word_embedding):
         super(NewsEncoder_v2, self).__init__()
@@ -62,7 +61,7 @@ class NewsEncoder_v2(torch.nn.Module):
             name:
             TextEncoder(word_embedding, config.word_embedding_dim,
                         config.num_filters, config.window_size,
-                        config.query_vector_dim, config.dropout_probability)
+                        config.num_attention_heads, config.dropout_probability)
             for name in (set(config.dataset_attributes['news'])
                          & set(text_encoders_candidates))
         })
