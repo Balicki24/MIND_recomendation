@@ -10,6 +10,7 @@ import pandas as pd
 from ast import literal_eval
 import importlib
 from multiprocessing import Pool
+import json
 
 try:
     Model = getattr(importlib.import_module("NAML_Model"), model_name)
@@ -248,8 +249,8 @@ def predict(model, directory, num_workers, max_count=sys.maxsize):
             user_vector = user2vector[minibatch['clicked_news_string'][0]]
             click_probability = model.get_prediction(candidate_news_vector, user_vector)
             ranks = (-click_probability).argsort().argsort() + 1
-            ranks_str = ' '.join(map(str, ranks.tolist()))
-            f.write(f"{impression_id} [{ranks_str}]\n")
+            ranks_str = json.dumps(ranks.tolist())  # Sửa đổi ở đây
+            f.write(f"{impression_id} {ranks_str}\n")
 
 
 if __name__ == '__main__':
