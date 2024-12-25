@@ -203,7 +203,7 @@ def predict(model, directory, num_workers, max_count=sys.maxsize):
         list(news2vector.values())[0].size())
 
     user_dataset = UserDataset(path.join(directory, 'behaviors.tsv'),
-                               'data/train/user2int.tsv')
+                               path.join(directory,'user2int.tsv'))
     user_dataloader = DataLoader(user_dataset,
                                  batch_size=config.batch_size * 16,
                                  shuffle=False,
