@@ -11,7 +11,7 @@ from ast import literal_eval
 import importlib
 from multiprocessing import Pool
 import json
-
+import zipfile
 try:
     Model = getattr(importlib.import_module("NAML_Model"), model_name)
     config = getattr(importlib.import_module('config'), f"{model_name}Config")
@@ -249,10 +249,11 @@ def predict(model, directory, num_workers, max_count=sys.maxsize):
             user_vector = user2vector[minibatch['clicked_news_string'][0]]
             click_probability = model.get_prediction(candidate_news_vector, user_vector)
             ranks = (-click_probability).argsort().argsort() + 1
-            ranks_str = json.dumps(ranks.tolist())  # Sửa đổi ở đây
+            ranks_str = '[' + ','.join(map(str, ranks.tolist())) + ']'
             f.write(f"{impression_id} {ranks_str}\n")
-
-
+    f = zipfile.ZipFile(path.join(directory, 'prediction.zip'), 'w', zipfile.ZIP_DEFLATED)
+    f.write(path.join(directory, 'prediction.txt'), arcname='prediction.txt')
+    f.close()
 if __name__ == '__main__':
     print('Using device:', device)
     print(f'Evaluating model {model_name}')
