@@ -74,3 +74,60 @@ class MultiHeadSelfAttention(nn.Module):
         context = context.transpose(1, 2).contiguous().view(
             batch_size, -1, self.num_attention_heads * self.d_v)
         return context
+    
+class CustomMultiHeadSelfAttention(nn.Module):
+    def __init__(self, d_model, num_attention_heads, candidate_vector_dim):
+        super(CustomMultiHeadSelfAttention, self).__init__()
+        self.d_model = d_model
+        self.num_attention_heads = num_attention_heads
+        assert d_model % num_attention_heads == 0
+        self.d_k = d_model // num_attention_heads
+        self.d_v = d_model // num_attention_heads
+
+        self.W_Q = nn.Linear(d_model, d_model)
+        self.W_K = nn.Linear(d_model, d_model)
+        self.W_V = nn.Linear(d_model, d_model)
+
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight, gain=1)
+
+    def forward(self, Q, K=None, V=None, length=None):
+        if K is None:
+            K = Q
+        if V is None:
+            V = Q
+        batch_size = Q.size(0)
+
+        q_s = self.W_Q(Q).view(batch_size, -1, self.num_attention_heads,
+                               self.d_k).transpose(1, 2)
+        k_s = self.W_K(K).view(batch_size, -1, self.num_attention_heads,
+                               self.d_k).transpose(1, 2)
+        v_s = self.W_V(V).view(batch_size, -1, self.num_attention_heads,
+                               self.d_v).transpose(1, 2)
+
+        if length is not None:
+            maxlen = Q.size(1)
+            attn_mask = torch.arange(maxlen).to(device).expand(
+                batch_size, maxlen) < length.to(device).view(-1, 1)
+            attn_mask = attn_mask.unsqueeze(1).expand(batch_size, maxlen,
+                                                      maxlen)
+            attn_mask = attn_mask.unsqueeze(1).repeat(1,
+                                                      self.num_attention_heads,
+                                                      1, 1)
+        else:
+            attn_mask = None
+
+        context, attn = ScaledDotProductAttention(self.d_k)(q_s, k_s, v_s,
+                                                            attn_mask)
+        context = context.transpose(1, 2).contiguous().view(
+            batch_size, -1, self.num_attention_heads * self.d_v)
+
+        # Global pooling to reduce sequence length
+        pooled_context = torch.mean(context, dim=1)  # (batch_size, d_model)
+
+
+        return pooled_context
