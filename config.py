@@ -2,7 +2,7 @@ import os
 
 model_name = os.environ['MODEL_NAME'] if 'MODEL_NAME' in os.environ else 'NAML'
 # Currently included model
-assert model_name in ['NAML']
+assert model_name in ['NAML','NAML_v2']
 
 
 class BaseConfig():
@@ -45,3 +45,11 @@ class NAMLConfig(BaseConfig):
     num_filters = 300
     window_size = 3
 
+class NAML_v2Config(BaseConfig):
+    dataset_attributes = {
+        "news": ['category', 'subcategory', 'title', 'abstract'],
+        "record": []
+    }
+    num_filters = 300
+    window_size = 3
+    num_attention_heads = 15
